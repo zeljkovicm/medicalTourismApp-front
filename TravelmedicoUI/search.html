@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <title>Search</title>
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/search.css">
+        <link rel="stylesheet" href="css/modal.css">
+        <link href='https://use.fontawesome.com/releases/v5.8.1/css/all.css' rel='stylesheet'>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+</head>
+
+<body oncontextmenu='return false' class='snippet-body'>
+
+<section class="background-color py-4 my-5">
+    <div class="container">
+        <div class="row" id="treatments">
+            <div class="text-center">
+                <img src="img/logo.png"
+                     style="width: 100px;" alt="logo">
+                <h4 class="mt-1 mb-5 pb-1">We are Travelmedico</h4>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Treatment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-content">
+
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/bootstrap.js"></script>
+
+<script>
+
+    $(document).ready(function() {
+
+        $.ajax({
+            url: 'http://localhost:8080/treatment/get/all/treatments',
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+            },
+            success: function (result){
+                $.each(result, function(i, item) {
+                    $("#treatments").append(
+                    '    <div class="col-md-6 col-lg-4">' +
+                    '        <div class="card my-3">' +
+                    '            <img src="img/' + item.imgUrl +'">' +
+                    '               <div class="card-body">' +
+                    '                    <h3 class="card-title">' +
+                    "                       <a href='javascript:;' data-route=\"http://localhost:8080/treatment/get/treatment/category/by/id?treatmentId="+item.treatmentId+"\" class=\"text-secondary treatment-name-helper\" data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\">" + item.treatmentName +"</a>\n" +
+                    '                    </h3>' +
+                    '                    <p class="card-text">' + item.treatmentDescription + '</p>' +
+                    '                    <a href="javascript:;" data-treatment-id="' + item.treatmentId +'" id="btn-reservation" class="btn btn-primary gradient-custom-2">Reservation</a>' +
+                    '               </div>' +
+                    '        </div>' +
+                    '    </div>'
+
+                    );
+                });
+            }
+        });
+
+    });
+
+
+    $(document).on('click', '.treatment-name-helper', function () {
+
+        $("#modal-content").empty();
+        var url = $(this).data("route");
+        $.ajax({
+            url: url,
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+            },
+            success: function (result){
+                if (result == null)
+                {
+                    $("#modal-content").append("The treatment is not found!");
+                }else{
+                    $("#modal-content").append(
+                        '<main class="col-md-12 col-lg-12 p-5">\n' +
+                        '        <form action="" id="about-form">\n' +
+                        '            <div class="m-3">\n' +
+                        '                <img src="img/' + result.imgUrl + '" width="auto" height="200">'+
+                        '            </div>\n' +
+                        '            <div class="m-3">\n' +
+                        '                <label for="treatmentName" >Treatment name</label>\n' +
+                        '                <input type="text" name="treatmentName" id="treatmentName" class="form-control" value="'+ result.treatmentName +'" readonly>\n' +
+                        '            </div>\n' +
+                        '            <div class="m-3">\n' +
+                        '                <label for="categoryName" >Category name</label>\n' +
+                        '                <input type="text" name="categoryName" id="categoryName" class="form-control" value="'+ result.category.categoryName +'" readonly>\n' +
+                        '            </div>\n' +
+                        '            <div class="m-3">\n' +
+                        '                 <label for="treatmentDescription" >Treatment description</label>\n' +
+                        '                 <textarea name="treatmentDescription" id="treatmentDescription" class="form-control" readonly>'+ result.treatmentDescription +'</textarea>\n' +
+                        '            </div>\n' +
+                        '            <div class="m-3">\n' +
+                        '                    <label for="price" >Price</label>\n' +
+                        '                    <input type="text" name="price" id="price" class="form-control" value="'+ result.price +'" readonly>\n' +
+                        '                </div>\n' +
+                        '        </form>\n' +
+                        '        <div class="p-5" id="body-for-append">\n' +
+                        '        </div>\n' +
+                        '    </main>');
+
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-reservation', function () {
+
+        var id = $(this).data("treatment-id");
+        localStorage.setItem("treatmentId", id);
+        location.replace("reservation.html");
+    });
+
+
+</script>
+
+</body>
+</html>

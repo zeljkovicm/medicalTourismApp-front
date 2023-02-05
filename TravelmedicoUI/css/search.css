@@ -1,0 +1,42 @@
+.background-color {
+    /* fallback for old browsers */
+    background: rgba(152, 196, 84, 0.15 );
+}
+
+.gradient-custom-2 {
+    /* fallback for old browsers */
+    background: #fccb90;
+
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, #98c454, #60b057, #60b057, #98c454);
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right,  #98c454, #60b057, #60b057, #98c454);
+}
+
+.btn{
+    border-style: none;
+    box-shadow: 0 5px 5px rgba(33,33,33,.2);
+}
+
+.btn:hover{
+   box-shadow: 0 7px 7px rgba(33,33,33,.3);
+}
+
+.card-img-top {
+    max-height: 250px;
+    overflow: hidden;
+}
+
+.card-title a:link {
+    font-size: 30px;
+    background-color: transparent;
+    color: #000000;
+    text-decoration: none;
+}
+
+.card-title a:hover {
+    color: red;
+    background-color: transparent;
+    text-decoration: underline;
+}

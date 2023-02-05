@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title>Reservation</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/signin.css">
+    <link rel="stylesheet" href="css/mdb.min.css">
+    <link rel="stylesheet" href="lib/toastr/css/toastr.min.css">
+</head>
+<body class="text-center">
+
+<section class="h-100 gradient-form" style="background-color: #eee;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-xl-10">
+                <div class="card rounded-3 text-black">
+                    <div class="row g-0">
+                        <div class="col-lg-6">
+                            <div class="card-body p-md-5 mx-md-4">
+
+                                <div class="text-left">
+                                    <img src="img/logo.png" style="width: 50px;" alt="logo">
+                                    <h5 class="mt-1 mb-4 pb-1">We are Travelmedico</h5>
+                                </div>
+
+                                <div id="treatment-info">
+
+                                </div>
+
+                                <div id="user-info">
+
+                                </div>
+
+                                <form id="form-reservation">
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="phone" class="form-control" />
+                                        <label class="form-label" for="phone">Phone</label>
+                                    </div>
+
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="address" class="form-control" />
+                                        <label class="form-label" for="address">Address</label>
+                                    </div>
+
+
+                                    <div class="form-group mb-4">
+                                        <select name='state' id='state' class="form-control" >
+                                            <option value='' disabled selected>Choose a state...</option>
+                                            <option value='Srbija'>Serbia</option>
+                                            <option value='USA'>USA</option>
+                                            <option value='UK'>UK</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group mb-4">
+                                        <input type='date' name='date' id='date' class='form-control' />
+                                    </div>
+
+                                    <div class="form-outline mb-4">
+                                        <textarea class="form-control" name="message" id="message"  rows="4"></textarea>
+                                        <label class="form-label" for="message">Message</label>
+                                    </div>
+
+                                    <div class="text-center pt-1 mb-1 pb-1">
+                                        <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" id="btn-submit" type="button">Reservation</button>
+                                    </div>
+
+                                    <div class="text-center pt-1 mb-5 pb-0">
+                                        <button class="btn btn-danger btn-block fa-lg " id="btn-cancel" type="button">Cancel</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+                            <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                                <h4 class="mb-4">We are more than just a company</h4>
+                                <p class="small mb-0">Travelmedico is a confidential and independent resource for patients and industry providers.
+                                                      Our mission is to provide a central portal where patients, medical tourism providers, hospitals,
+                                                      clinics can all find the information they need. Our site focuses on patients looking for specific
+                                                      knowledge in the fields of medical tourism, dental tourism, and health tourism.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
+
+<script src="js/bootstrap.js"></script>
+<script src="js/mdb.min.js"></script>
+
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous">
+</script>
+
+<!-- Toastr je JS biblioteka za non-blocking notifikacije -->
+<script src="lib/toastr/js/toastr.min.js"></script>
+
+<script>
+
+    $(document).ready(function() {
+
+               //Postavljamo datum da ne moze da se bira pre danasnjeg dana
+                date.min = new Date().toISOString().split("T")[0];
+
+                var treatmentId = localStorage.getItem("treatmentId");
+
+                // Podaci o tretmanu
+                $.ajax({
+                    url: 'http://localhost:8080/treatment/get/treatment/by/id?treatmentId=' + treatmentId,
+                    type: "GET",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+                    },
+                    success: function (result){
+
+                        $("#treatment-info").append(
+
+                        '    <div class="wrapper">\n' +
+                        '        <img src="img/' + result.imgUrl + '" width="150" height="auto">'+
+                        '        <span>' + result.treatmentName +
+                        '                <h2>' +  result.price + '</h2>' +
+                        '        </span>' +
+                        '    </div>\n'
+                        );
+
+                    }
+                });
+
+        $.ajax({
+            url: 'http://localhost:8080/user/get/user/by/'+ localStorage.getItem("email"),
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+            },
+            success: function (result){
+
+                $("#user-info").append(
+
+                    '        <input type="hidden" name="userId" id="userId" class="form-control" value="' + result.userId + '">\n' +
+                    '    <div class="mb-4 user-info">' +
+                    '        <input type="text" id="firstName" class="form-control" value="'+ result.firstName +'" readonly/>' +
+                    '    </div>' +
+                    '    <div class="mb-4 user-info">' +
+                    '        <input type="text" id="lastName" class="form-control" value="'+ result.lastName +'"readonly/>' +
+                    '    </div>' +
+                    '    <div class="mb-4 user-info">' +
+                    '        <input type="email" id="email" class="form-control" value="'+ result.email +'" readonly/>' +
+                    '    </div>'
+                );
+
+            }
+        });
+
+    });
+
+
+    $(document).on('click', '#btn-submit', function () {
+
+        //Cuvamo dodatne podatke o korisniku
+
+        if($("#phone").val() != '' && $("#address").val() != '' && $("#state").val() != null && $("#date").val() != '' ){
+
+            var dataForm = {"userId": $("#userId").val(), "firstName": $("#firstName").val(), "lastName": $("#lastName").val(),"phoneNumber": $("#phone").val(), "address": $("#address").val(), "state": $("#state").val(), "email": localStorage.getItem("email")};
+
+            $.ajax({
+                url: 'http://localhost:8080/user/edit',
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(dataForm),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+                },
+                error: function (result){
+                    toastr.error(result.responseText);
+                },
+                success: function (result){
+                }
+            });
+
+            var dataForm = {"userId": $("#userId").val(), "treatmentId": localStorage.getItem("treatmentId"), "amount": $("h2").text(),"message": $("#message").val(), "date": $("#date").val() };
+            $.ajax({
+                url: 'http://localhost:8080/reservation/create',
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(dataForm),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+                },
+                error: function (result){
+                    if(result==null)
+                        toastr.error("Booked");
+                    else
+                        toastr.error(result.responseText);
+                },
+                success: function (result){
+                    location.replace("user.html");
+                }
+            });
+
+        }
+        else{
+            toastr.error("Form not filled out!");
+        }
+
+
+    });
+
+    $(document).on('click', '#btn-cancel', function () {
+        location.replace("search.html");
+
+    });
+
+</script>

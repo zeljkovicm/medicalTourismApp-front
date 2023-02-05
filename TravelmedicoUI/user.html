@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title>User</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/user.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/mdb.min.css">
+</head>
+<body>
+
+<section style="background-color: #f4f5f7;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-lg-6 mb-4 mb-lg-0">
+                <div class="card mb-3" style="border-radius: .5rem;">
+                    <div class="row g-0">
+                        <div class="col-md-4 gradient-custom text-center text-white" id="user-div"
+                             style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body p-4">
+                                <h5><b>Information</b></h5>
+                                <hr class="mt-0 mb-4">
+                                <div class="row pt-1" id="user-info">
+
+                                </div>
+                                <h5><b>Treatments</b></h5>
+                                <hr class="mt-0 mb-4">
+                                <div class="row pt-1">
+                                    <button type="button" class="btn btn-info" id="btn-search">Search treatments</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-reservations" style="background-color: #f4f5f7;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-lg-6 mb-4 mb-lg-0">
+                <div class="card mb-3" style="border-radius: .5rem;">
+                    <div class="row g-0">
+                        <div class="container-fluid">
+                            <main class="col-md-12 col-lg-12 p-5">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-sm">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col"><b>Id</b></th>
+                                            <th scope="col" class="text-center"><b>Date</b></th>
+                                            <th scope="col" class="text-center"><b>Amount</b></th>
+                                            <th scope="col" class="text-center"><b>Message</b></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="table-body"></tbody>
+                                    </table>
+                                </div>
+                            </main>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Treatment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-content">
+
+            </div>
+            <div class="modal-footer" id="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script src="js/bootstrap.js"></script>
+<script src="js/mdb.min.js"></script>
+
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous">
+</script>
+
+<script>
+
+    var token = localStorage.getItem("token");
+    var email = localStorage.getItem("email");
+
+    if (!token || !email)
+    {
+        location.replace("login.html");
+    }
+
+    $(document).ready(function() {
+
+        $.ajax({
+            url: 'http://localhost:8080/user/get/user/by/' + email,
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+            },
+            success: function (result){
+
+                var photo_url = (result.gender == 'M')? 'img/male.png':'img/female.png';
+
+                    $("#user-div").append(
+                        '<img src=' + photo_url + ' alt="Avatar" class="img-fluid my-5" style="width: 80px;margin-top: 50px;"/>'+
+                        '<h5 style="margin-top: 10px;">' + result.firstName + ' ' + result.lastName + '</h5>' +
+                        '<p>User</p>' +
+                        '<i class="far fa-edit mb-5"></i>'
+                    );
+
+                    var phone = (result.phoneNumber)? result.phoneNumber:"N/A";
+                    var address = (result.address)? result.address:"N/A";
+                    var state = (result.state)? result.state:"N/A";
+
+                    $("#user-info").append(
+                        '<div className="col-6 mb-3">' +
+                        '<h6><b>Email</b></h6>' +
+                        '<p className="text-muted" id="">' +result.email + '</p>' +
+                        '</div>' +
+                        '<div className="col-6 mb-3">' +
+                        '<h6><b>Phone</b></h6>' +
+                        '<p className="text-muted">' + phone + '</p>'+
+                        '</div>'+
+                        '<div className="col-6 mb-3">' +
+                        '<h6><b>Address</b></h6>' +
+                        '<p className="text-muted">' + address + '</p>'+
+                        '</div>'+
+                        '<div className="col-6 mb-3">' +
+                        '<h6><b>State</b></h6>' +
+                        '<p className="text-muted">' + state + '</p>'+
+                        '</div>'
+                    );
+            }
+        });
+
+        $.ajax({
+            url: 'http://localhost:8080/user/get/user/reservations/by/email?email=' + email,
+            type: "GET",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+            },
+            success: function (result){
+                $.each(result.reservations, function(i, item) {
+                    $("#table-body").append(
+                        "<tr>\n" +
+                        "<td>"+item.reservationId+"</td>\n" +
+                        "<td class=\"text-center\">"+item.date+"</td>\n" +
+                        "<td class=\"text-center\">"+item.amount+"</td>\n" +
+                        "<td class=\"text-center\">"+item.message+"</td>\n" +
+                        "<td class=\"text-center\">" +
+                        "<a href='javascript:;' data-route=\"http://localhost:8080/treatment/get/treatment/category/by/id?treatmentId="+item.treatmentId+"\" class=\"btn btn-success btn-sm btn-about-helper\" data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\">About treatment</a>\n" +
+                        "<a href='javascript:;' data-route=\"http://localhost:8080/reservation/get/reservation/treatment/by/id?reservationId="+item.reservationId+"\"  class=\"btn btn-danger btn-sm btn-delete-helper\"  data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\">Delete reservation</a>" +
+                        "</td>\n" +
+                        "<td></td>\n" +
+                        " </tr>"
+                    );
+                });
+            }
+        });
+
+        $("#btn-search").click(function (){
+            location.replace("search.html");
+        });
+
+    });
+
+        //Prikazivanje informacija o tretmanu
+        $(document).on('click', '.btn-about-helper', function () {
+
+            $("#modal-content").empty();
+            $("#modal-footer").empty();
+            var url = $(this).data("route");
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function (xhr) { //Za autentifikaciju moramo da koristimo ajax, a ne get poziv
+                    xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+                },
+                success: function (result){
+                    if (result == null)
+                    {
+                        $("#modal-content").append("The treatment is not found!");
+                    }else{
+                        $("#modal-content").append(
+                            '<main class="col-md-12 col-lg-12 p-5">\n' +
+                            '        <form action="" id="about-form">\n' +
+                            '            <div class="m-3">\n' +
+                            '                <img src="img/' + result.imgUrl + '" width="auto" height="200">'+
+                            '            </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                <label for="treatmentName" >Treatment name</label>\n' +
+                            '                <input type="text" name="treatmentName" id="treatmentName" class="form-control" value="'+ result.treatmentName +'" readonly>\n' +
+                            '            </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                <label for="categoryName" >Category name</label>\n' +
+                            '                <input type="text" name="categoryName" id="categoryName" class="form-control" value="'+ result.category.categoryName +'" readonly>\n' +
+                            '            </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                 <label for="treatmentDescription" >Treatment description</label>\n' +
+                            '                 <textarea name="treatmentDescription" id="treatmentDescription" class="form-control" readonly>'+ result.treatmentDescription +'</textarea>\n' +
+                            '            </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                 <label for="price" >Price</label>\n' +
+                            '                 <input type="text" name="price" id="price" class="form-control" value="'+ result.price +'" readonly>\n' +
+                            '           </div>\n' +
+                            '        </form>\n' +
+                            '        <div class="p-5" id="body-for-append">\n' +
+                            '        </div>\n' +
+                            '    </main>');
+
+                        $("#modal-footer").append(
+                            ' <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>'
+                        );
+
+                    }
+                }
+            });
+        });
+
+        //Brisanje rezervacije
+        $(document).on('click', '.btn-delete-helper', function () {
+            $("#modal-content").empty();
+            $("#modal-footer").empty();
+            var url = $(this).data("route");
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+                },
+                success: function (result){
+                    if (result == null)
+                    {
+                        $("#modal-content").append("Reservation doesn't exist!");
+                    }else {
+
+                        $("#modal-content").append(
+                            '<main class="col-md-12 col-lg-12 p-5">\n' +
+                            '   <h5 style="color: red; text-align: center">Are you sure you want to delete this reservation?</h5>\n' +
+                            '        <form action="" id="about-form">\n' +
+                            '               <input type="hidden" name="id" id="reservationId" class="form-control" value="' + result.reservationId + '">\n' +
+                            '            <div class="m-3">\n' +
+                            '                <img src="img/' + result.treatment.imgUrl + '" width="auto" height="200">'+
+                            '            </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                <label for="treatmentName" >Treatment name</label>\n' +
+                            '                <input type="text" name="treatmentName" id="treatmentName" class="form-control" value="'+ result.treatment.treatmentName +'" readonly>\n' +
+                            '            </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                 <label for="treatmentDescription" >Treatment description</label>\n' +
+                            '                 <textarea name="treatmentDescription" id="treatmentDescription" class="form-control" readonly>'+ result.treatment.treatmentDescription +'</textarea>\n' +
+                            '            </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                    <label for="date" >Date od reservation</label>\n' +
+                            '                    <input type="text" name="date" id="date" class="form-control" value="'+ result.date +'" readonly>\n' +
+                            '                </div>\n' +
+                            '            <div class="m-3">\n' +
+                            '                    <label for="amount" >Amount</label>\n' +
+                            '                    <input type="text" name="amount" id="amount" class="form-control" value="'+ result.amount +'" readonly>\n' +
+                            '                </div>\n' +
+                            '        </form>\n' +
+                            '        <div class="p-5" id="body-for-append">\n' +
+                            '        </div>\n' +
+                            '    </main>');
+
+                        $("#modal-footer").append(
+                            ' <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>' +
+                            '<button type="button" id="btn-delete-reservation" class="btn btn-danger">Delete</button>'
+                        );
+
+
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '#btn-delete-reservation', function () {
+            var dataForm = { "reservationId": $("#reservationId").val() };
+            $.ajax({
+                url: 'http://localhost:8080/reservation/delete',
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(dataForm),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", "Bearer " + localStorage.getItem("token"));
+                },
+                success: function (result){
+                    location.replace("user.html");
+                }
+            });
+
+            location.replace("user.html");
+        });
+
+
+</script>

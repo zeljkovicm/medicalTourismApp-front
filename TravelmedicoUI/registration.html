@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title>Registration</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/signin.css">
+    <link rel="stylesheet" href="css/mdb.min.css">
+    <link rel="stylesheet" href="lib/toastr/css/toastr.min.css">
+</head>
+<body class="text-center">
+
+<section class="h-100 gradient-form" style="background-color: #eee;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-xl-10">
+                <div class="card rounded-3 text-black">
+                    <div class="row g-0">
+                        <div class="col-lg-6">
+                            <div class="card-body p-md-5 mx-md-4">
+
+                                <div class="text-center">
+                                    <img src="img/logo.png"
+                                         style="width: 100px;" alt="logo">
+                                    <h4 class="mt-1 mb-5 pb-1">We are Travelmedico</h4>
+                                </div>
+
+                                <form>
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="first-name" class="form-control"/>
+                                        <label class="form-label" for="first-name">First name</label>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <input type="text" id="last-name" class="form-control"/>
+                                        <label class="form-label" for="last-name">Last name</label>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Z">
+                                            <label class="form-check-label" for="inlineRadio1">Female</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="M"  checked>
+                                            <label class="form-check-label" for="inlineRadio2">Male</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-outline mb-4">
+                                        <input type="email" id="email" class="form-control"/>
+                                        <label class="form-label" for="email">Email</label>
+                                    </div>
+
+                                    <div class="form-outline mb-4">
+                                        <input type="password" id="password" class="form-control"/>
+                                        <label class="form-label" for="password">Password</label>
+                                    </div>
+
+                                    <div class="form-outline mb-4">
+                                        <input type="password" id="retype-password" class="form-control"/>
+                                        <label class="form-label" for="retype-password">Retype password</label>
+                                    </div>
+
+                                    <div class="text-center pt-1 mb-4 pb-1">
+                                        <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" id="btn-submit" type="button">Registration</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+                            <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                                <h4 class="mb-4">We are more than just a company</h4>
+                                <p class="small mb-0">Travelmedico is a confidential and independent resource for patients and industry providers.
+                                    Our mission is to provide a central portal where patients, medical tourism providers, hospitals,
+                                    clinics can all find the information they need. Our site focuses on patients looking for specific
+                                    knowledge in the fields of medical tourism, dental tourism, and health tourism.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
+
+<script src="js/bootstrap.js"></script>
+<script src="js/mdb.min.js"></script>
+
+<script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous">
+</script>
+
+<!-- Toastr je JS biblioteka za non-blocking notifikacije -->
+<script src="lib/toastr/js/toastr.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $("#btn-submit").click(function (){
+
+            var password = $("#password").val();
+            var retype_password = $("#retype-password").val();
+
+            // Ako se sifre poklapaju saljemo zahtev
+            if( password == retype_password){
+                var dataForm = {"firstName": $("#first-name").val(), "lastName": $("#last-name").val(),"gender": $("[name = inlineRadioOptions]:checked").val() ,"email": $("#email").val(), "password": $("#password").val(), "roleId": 1};
+
+                $.ajax({
+                    url: 'http://localhost:8080/auth/registration',
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(dataForm),
+                    error: function (result){
+                        toastr.error(result.responseText);
+                    },
+                    success: function (result){
+                        toastr.success(result, {timeOut: 5000});
+                        location.replace("login.html");
+                    }
+                });
+            }
+            else{
+                toastr.error("Passwords do not match. Try again!");
+                location.reload();
+            }
+
+        });
+    });
+</script>

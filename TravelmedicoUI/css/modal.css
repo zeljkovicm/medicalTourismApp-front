@@ -1,0 +1,27 @@
+
+img{
+    border-radius: 3px;
+}
+
+label{
+    font-weight: bold;
+}
+
+input[type="text"], textarea {
+    border-style:none;
+    pointer-events:none;
+}
+
+#treatmentDescription{
+    height: 150px;
+}
+
+.modal-header, .modal-footer{
+    background: #f6d365;
+
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right bottom, #98c454, #60b057, #60b057, #98c454);
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right bottom, #98c454, #60b057, #60b057, #98c454)
+}
